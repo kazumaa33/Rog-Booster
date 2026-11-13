@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/rog_bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:contentDescription="Rog Booster"
+            android:src="@drawable/rog_banner" />
+
+        <!-- ESTADO DEL SISTEMA -->
+        <LinearLayout
+            style="@style/RogCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical">
+
+            <TextView style="@style/RogSectionTitle" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="ESTADO DEL SISTEMA" />
+
+            <TextView android:id="@+id/tvRam" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:textColor="@color/rog_text" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressRam" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginVertical="6dp"
+                app:indicatorColor="@color/rog_cyan" app:trackColor="@color/rog_card_stroke"
+                app:trackCornerRadius="4dp" />
+
+            <TextView android:id="@+id/tvTemp" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="6dp"
+                android:textColor="@color/rog_text" />
+
+            <TextView android:id="@+id/tvThermal" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:textStyle="bold" />
+
+            <TextView android:id="@+id/tvStatus" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                android:textColor="@color/rog_text_dim" android:textSize="12sp" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnClean" android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_marginEnd="6dp"
+                    android:layout_weight="1" android:text="Limpiar RAM"
+                    android:textColor="@color/rog_bg" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStop" android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:layout_marginStart="6dp"
+                    android:layout_weight="1" android:backgroundTint="@color/rog_red"
+                    android:text="Detener modo juego" android:textColor="@android:color/white"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- PERMISOS -->
+        <LinearLayout
+            style="@style/RogCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/RogSectionTitle" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="PERMISOS" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermNotif"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:textColor="@color/rog_text"
+                app:strokeColor="@color/rog_card_stroke" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermDnd"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:textColor="@color/rog_text"
+                app:strokeColor="@color/rog_card_stroke" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermOverlay"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:textColor="@color/rog_text"
+                app:strokeColor="@color/rog_card_stroke" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermWrite"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:textColor="@color/rog_text"
+                app:strokeColor="@color/rog_card_stroke" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPermUsage"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:textColor="@color/rog_text"
+                app:strokeColor="@color/rog_card_stroke" />
+        </LinearLayout>
+
+        <!-- AJUSTES DE PARTIDA -->
+        <LinearLayout
+            style="@style/RogCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/RogSectionTitle" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="AJUSTES DE PARTIDA" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchOverlay" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="Overlay de FPS y temperatura"
+                android:textColor="@color/rog_text" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchCrosshair" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="Mira (crosshair) en el centro"
+                android:textColor="@color/rog_text" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchBrightness" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="Fijar brillo de pantalla"
+                android:textColor="@color/rog_text" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sliderBrightness" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:stepSize="1"
+                android:valueFrom="10" android:valueTo="255" android:value="200"
+                app:thumbColor="@color/rog_cyan" app:trackColorActive="@color/rog_cyan" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchPointer" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="Velocidad del puntero"
+                android:textColor="@color/rog_text" />
+
+            <TextView android:id="@+id/tvPointerVal" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:textColor="@color/rog_text_dim"
+                android:textSize="12sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sliderPointer" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:stepSize="1"
+                android:valueFrom="-7" android:valueTo="7" android:value="0"
+                app:thumbColor="@color/rog_red" app:trackColorActive="@color/rog_red" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDpi" style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Sensibilidad / DPI (Opciones de desarrollador)"
+                android:textColor="@color/rog_cyan" app:strokeColor="@color/rog_cyan" />
+        </LinearLayout>
+
+        <!-- JUEGOS -->
+        <LinearLayout
+            style="@style/RogCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView style="@style/RogSectionTitle" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="MIS JUEGOS" />
+
+            <TextView android:id="@+id/tvEmpty" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:text="No se detectaron juegos instalados."
+                android:textColor="@color/rog_text_dim" android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvGames" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
