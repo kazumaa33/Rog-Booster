@@ -3,7 +3,6 @@ package com.rogbooster.app.service
 import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Handler
@@ -17,7 +16,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
-import androidx.core.app.ServiceCompat
 import com.rogbooster.app.R
 import com.rogbooster.app.core.Prefs
 import com.rogbooster.app.core.SystemMonitor
@@ -64,13 +62,17 @@ class FloatingWidgetService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (!Settings.canDrawOverlays(this)) { stopSelf(); return START_NOT_STICKY }
-        ServiceCompat.startForeground(
-            this, 1002, Notifier.foreground(this, "Overlay de rendimiento activo"),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        )
+        if (!Notifier.startFg(this, 1002, Notifier.foreground(this, "Overlay de rendimiento activo"))) {
+            stopSelf(); return START_NOT_STICKY
+        }
         wm = getSystemService(WINDOW_SERVICE) as WindowManager
-        if (widget == null) addWidget()
-        syncCrosshair()
+        try {
+            if (widget == null) addWidget()
+            syncCrosshair()
+        } catch (e: Exception) {
+            Prefs.putStrSync(this, "last_report", "Overlay: ${e.javaClass.simpleName}: ${e.message}")
+            stopSelf(); return START_NOT_STICKY
+        }
         if (!running) {
             running = true
             Choreographer.getInstance().postFrameCallback(frameCb)
@@ -124,6 +126,7 @@ class FloatingWidgetService : Service() {
 
     override fun onDestroy() {
         running = false
+        if (!::wm.isInitialized) { super.onDestroy(); return }
         handler.removeCallbacksAndMessages(null)
         Choreographer.getInstance().removeFrameCallback(frameCb)
         widget?.let { wm.removeView(it) }; widget = null

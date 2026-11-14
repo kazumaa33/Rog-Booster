@@ -9,6 +9,8 @@ object Prefs {
     fun putBool(c: Context, k: String, v: Boolean) = sp(c).edit().putBoolean(k, v).apply()
     fun int(c: Context, k: String, d: Int) = sp(c).getInt(k, d)
     fun putInt(c: Context, k: String, v: Int) = sp(c).edit().putInt(k, v).apply()
+    fun str(c: Context, k: String, d: String) = sp(c).getString(k, d) ?: d
+    fun putStrSync(c: Context, k: String, v: String) = sp(c).edit().putString(k, v).commit()
 
     // Claves de configuración
     const val OVERLAY = "overlay_enabled"

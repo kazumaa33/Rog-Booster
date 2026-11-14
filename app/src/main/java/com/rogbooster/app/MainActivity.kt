@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         ) ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 10)
     }
 
-    override fun onResume() { super.onResume(); handler.post(refresh); updatePermissionLabels() }
+    override fun onResume() { super.onResume(); handler.post(refresh); updatePermissionLabels(); showReportIfAny() }
     override fun onPause() { handler.removeCallbacks(refresh); super.onPause() }
 
     private fun loadGames() = Thread {
@@ -64,9 +64,33 @@ class MainActivity : AppCompatActivity() {
         if (!PermissionHelper.dnd(this) || !PermissionHelper.notifListener(this))
             Toast.makeText(this, "Faltan permisos de notificaciones: el bloqueo será parcial", Toast.LENGTH_LONG).show()
         Thread {
-            val ok = OptimizationManager.startGame(this, g.packageName)
-            if (!ok) runOnUiThread { Toast.makeText(this, "No se pudo abrir ${g.name}", Toast.LENGTH_SHORT).show() }
+            try {
+                val r = OptimizationManager.startGame(this, g.packageName)
+                if (!r.launched) runOnUiThread { Toast.makeText(this, "No se pudo abrir ${g.name}", Toast.LENGTH_SHORT).show() }
+            } catch (e: Throwable) {
+                Prefs.putStrSync(this, "last_report", "Error al lanzar:\n${e.javaClass.simpleName}: ${e.message}")
+            }
         }.start()
+    }
+
+    /** Muestra (una vez) el último error o aviso guardado, para poder copiarlo y enviarlo. */
+    private fun showReportIfAny() {
+        val rep = Prefs.str(this, "last_report", "")
+        if (rep.isEmpty()) return
+        Prefs.putStrSync(this, "last_report", "")
+        val tv = android.widget.TextView(this).apply {
+            text = rep; textSize = 12f; setTextIsSelectable(true)
+            setPadding(48, 24, 48, 24); setTextColor(Color.WHITE)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Informe de la última sesión")
+            .setView(android.widget.ScrollView(this).apply { addView(tv) })
+            .setPositiveButton("Copiar") { _, _ ->
+                val cm = getSystemService(android.content.ClipboardManager::class.java)
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("informe", rep))
+                Toast.makeText(this, "Copiado", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cerrar", null).show()
     }
 
     // ---- Estado en tiempo real ----

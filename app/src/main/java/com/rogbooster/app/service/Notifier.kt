@@ -6,7 +6,11 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.app.Service
+import android.content.pm.ServiceInfo
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
+import com.rogbooster.app.core.Prefs
 import com.rogbooster.app.MainActivity
 import com.rogbooster.app.R
 
@@ -35,6 +39,18 @@ object Notifier {
             .setContentIntent(openApp(ctx))
         if (stopIntent != null) b.addAction(0, "Detener", stopIntent)
         return b.build()
+    }
+
+    /** Inicia el servicio en primer plano sin tumbar la app si el sistema lo rechaza. */
+    fun startFg(s: Service, id: Int, n: Notification): Boolean = try {
+        ServiceCompat.startForeground(s, id, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        true
+    } catch (e: Exception) {
+        try { s.startForeground(id, n); true } catch (e2: Exception) {
+            Prefs.putStrSync(s, "last_report",
+                "No se pudo iniciar ${s.javaClass.simpleName} en primer plano:\n${e2.javaClass.simpleName}: ${e2.message}")
+            false
+        }
     }
 
     fun alert(ctx: Context, title: String, text: String) {

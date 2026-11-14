@@ -27,25 +27,42 @@ object OptimizationManager {
         return (SystemMonitor.ram(ctx).freeMb - before).coerceAtLeast(0)
     }
 
-    /** Aplica todas las optimizaciones y abre el juego. Devuelve false si no se puede lanzar. */
-    fun startGame(ctx: Context, pkg: String): Boolean {
-        val launch = ctx.packageManager.getLaunchIntentForPackage(pkg) ?: return false
+    data class StartResult(val launched: Boolean, val errors: List<String>)
+
+    private fun step(name: String, errors: MutableList<String>, block: () -> Unit) {
+        try { block() } catch (e: Throwable) { errors += "$name: ${e.javaClass.simpleName} ${e.message ?: ""}" }
+    }
+
+    /** Aplica las optimizaciones (cada una aislada) y abre el juego aunque alguna falle. */
+    fun startGame(ctx: Context, pkg: String): StartResult {
+        val errors = mutableListOf<String>()
+        val launch = ctx.packageManager.getLaunchIntentForPackage(pkg)
+            ?: return StartResult(false, listOf("El juego no tiene actividad de lanzamiento"))
         if (!GameState.isGameRunning) {            // evita sobrescribir el estado a restaurar
-            clearMemory(ctx, pkg)
-            DndController.enable(ctx)
-            AudioController.apply(ctx)
-            BrightnessController.apply(ctx)
-            PointerController.apply(ctx)
+            step("Limpiar RAM", errors) { clearMemory(ctx, pkg) }
+            step("No molestar", errors) { DndController.enable(ctx) }
+            step("Audio", errors) { AudioController.apply(ctx) }
+            step("Brillo", errors) { BrightnessController.apply(ctx) }
+            step("Puntero", errors) { PointerController.apply(ctx) }
         }
         GameState.currentPackage = pkg
         GameState.isGameRunning = true
 
-        ContextCompat.startForegroundService(ctx, Intent(ctx, GameGuardService::class.java))
-        if (Prefs.bool(ctx, Prefs.OVERLAY, true) && PermissionHelper.overlay(ctx)) {
-            ContextCompat.startForegroundService(ctx, Intent(ctx, FloatingWidgetService::class.java))
+        step("Vigilante", errors) {
+            ContextCompat.startForegroundService(ctx, Intent(ctx, GameGuardService::class.java))
         }
-        ctx.startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        return true
+        step("Overlay", errors) {
+            if (Prefs.bool(ctx, Prefs.OVERLAY, true) && PermissionHelper.overlay(ctx)) {
+                ContextCompat.startForegroundService(ctx, Intent(ctx, FloatingWidgetService::class.java))
+            }
+        }
+        var launched = false
+        step("Abrir juego", errors) {
+            ctx.startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); launched = true
+        }
+        if (errors.isNotEmpty())
+            Prefs.putStrSync(ctx, "last_report", "Optimizaciones que fallaron:\n" + errors.joinToString("\n"))
+        return StartResult(launched, errors)
     }
 
     /** Restaura el entorno original y detiene los servicios. */

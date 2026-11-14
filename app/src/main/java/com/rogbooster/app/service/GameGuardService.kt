@@ -5,11 +5,9 @@ import android.app.Service
 import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import androidx.core.app.ServiceCompat
 import com.rogbooster.app.GameState
 import com.rogbooster.app.core.OptimizationManager
 import com.rogbooster.app.core.PermissionHelper
@@ -30,8 +28,8 @@ class GameGuardService : Service() {
 
     private val tick = object : Runnable {
         override fun run() {
-            checkThermal()
-            checkGameAlive()
+            try { checkThermal() } catch (_: Exception) {}
+            try { checkGameAlive() } catch (_: Exception) {}
             handler.postDelayed(this, 2000)
         }
     }
@@ -45,10 +43,9 @@ class GameGuardService : Service() {
             this, 1, Intent(this, GameGuardService::class.java).setAction(ACTION_STOP),
             PendingIntent.FLAG_IMMUTABLE
         )
-        ServiceCompat.startForeground(
-            this, 1001, Notifier.foreground(this, "Modo juego activo", stop),
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        )
+        if (!Notifier.startFg(this, 1001, Notifier.foreground(this, "Modo juego activo", stop))) {
+            stopSelf(); return START_NOT_STICKY
+        }
         lastFg = GameState.currentPackage
         awayTicks = 0
         handler.removeCallbacks(tick)
